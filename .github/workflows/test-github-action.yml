@@ -11,6 +11,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Audit des dépendances
+        run: npm audit --audit-level=high
+
       - name: Build
         run: npm run build
 
