@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - run: npm run install
+      - run: npm install
       - run: npm run build
 
       - name: Cache node modules
