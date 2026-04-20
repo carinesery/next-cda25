@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "next build",
     "start": "next start",
     "e2e": "start-server-and-test dev http://localhost:3000 \"cypress open --e2e\"",
@@ -11,7 +11,7 @@
     "component:headless": "cypress run --component"
   },
   "dependencies": {
-    "next": "latest",
+    "next": "^16.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
