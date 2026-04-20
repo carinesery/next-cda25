@@ -38,6 +38,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chrome, edge]
+
     needs: build
     steps:
       - uses: actions/checkout@v6
@@ -57,17 +61,17 @@ jobs:
           install: false
           start: npm run start
           wait-on: http://localhost:3000
-          browser: chrome
+          browser: ${{ matrix.browser }}
       - name: Upload Cypress artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos
+          name: cypress-${{ matrix.browser }}
           path: cypress/videos
 
       - name: Upload Cypress screenshots (only on failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots
+          name: cypress-${{ matrix.browser }}
           path: cypress/screenshots
