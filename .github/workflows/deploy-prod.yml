@@ -1,0 +1,30 @@
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy SSH
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /home/azureuser/production/next-cda25 &&
+            git pull origin main &&
+            npm ci &&
+            npm run build &&
+            pm2 restart app-prod || pm2 start npm --name app-prod -- start
+          "
