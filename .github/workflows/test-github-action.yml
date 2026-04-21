@@ -130,6 +130,14 @@ jobs:
           script: |
             echo "Connexion OK"
             ls
+
+            echo "Chargement NVM"
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            echo "Version node"
+            node -v
+
             cd /home/azureuser/next-cda25
 
             echo "Pull du code"
