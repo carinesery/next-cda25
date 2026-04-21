@@ -1,6 +1,17 @@
 on: push
 
 jobs:
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm audit --audit-level=high
+        continue-on-error: true
+        
   build:
     runs-on: ubuntu-latest
     steps:
@@ -14,9 +25,9 @@ jobs:
       # - name: Lint
       #   run: npm run lint
 
-      - name: Audit des dépendances
-        run: npm audit --audit-level=high
-        continue-on-error: true
+      # - name: Audit des dépendances
+      #   run: npm audit --audit-level=high
+      #   continue-on-error: true
 
       - name: Build
         run: npm run build
