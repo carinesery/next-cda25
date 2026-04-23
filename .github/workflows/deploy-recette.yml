@@ -1,24 +1,47 @@
-on:
-  push:
-    branches:
-      - develop
+# on:
+#   push:
+#     branches:
+#       - '**'
+#     tags:
+#       - 'v**'
 
-jobs:
-  deploy:
+# jobs:
+
+  # build-and-push-docker:
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/v')
+  #   permissions:
+  #     contents: read
+  #     packages: write
+
+  #   steps:
+  #     - uses: actions/checkout@v6
+
+  #     - name: Login GHCR
+  #       uses: actions/docker/login@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: extratct metadata (tags, labels) for Docker
+  #       id: meta
+  #       uses: docker/metadata-action@v6
+  #       with:
+  #         images: ghcr.io/${{ github.repository }}/next
+
+  #     - name: Build et push de l'iamge
+  #       uses: docker/build-push-action@v6
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta.outputs.tags }}
+  #         labels: ${{ steps.meta.outputs.labels }}
+
+  deploy-recette:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
-      - name: Install
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
       - name: config SSH
         run: |
           mkdir -p ~/.ssh
@@ -26,12 +49,44 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy SSH
+      - name: Deploy on recette VM
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
             cd /home/azureuser/recette/next-cda25 &&
-            git pull origin develop &&
-            npm ci &&
-            npm run build &&
-            pm2 restart app-recette || pm2 start npm --name app-recette -- start
+            docker compose -f compose.recette.yml down || true &&
+            docker compose -f compose.recette.yml up -d
           "
+# A la base, mis juste avant le cd
+#docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} &&
+# docker pull ghcr.io/carinesery/next-cda25/next:latest &&
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v6
+
+  #     - uses: actions/setup-node@v6
+  #       with:
+  #         node-version: 24
+
+  #     - name: Install
+  #       run: npm ci
+
+  #     - name: Build
+  #       run: npm run build
+
+  #     - name: config SSH
+  #       run: |
+  #         mkdir -p ~/.ssh
+  #         echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+  #         chmod 600 ~/.ssh/id_rsa
+  #         ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+  #     - name: Deploy SSH
+  #       run: |
+  #         ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+  #           cd /home/azureuser/recette/next-cda25 &&
+  #           git pull origin develop &&
+  #           npm ci &&
+  #           npm run build &&
+  #           pm2 restart app-recette || PORT=30001 pm2 start npm --name app-recette -- start
+  #         "

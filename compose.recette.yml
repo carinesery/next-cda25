@@ -1,0 +1,6 @@
+services:
+  app:
+    image: ghcr.io/carinesery/next-cda25/next:latest
+    ports:
+      - "3000:3000"
+    restart: always
